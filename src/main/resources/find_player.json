@@ -1,0 +1,10 @@
+{
+  "method": "POST",
+  "in": {
+    "name": "name"
+  },
+  "out": {
+    "isOnline": true,
+    "server": "server_name"
+  }
+}

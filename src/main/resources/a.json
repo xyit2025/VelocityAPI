@@ -1,0 +1,13 @@
+{
+  "port": 8080,
+  "token": [
+    "123456789",
+    "987654321"
+  ],
+  "address": {
+    "base": "/vc",
+    "query": "/query",
+    "find_player": "/find_player",
+    "hh": "/hh"
+  }
+}
