@@ -37,7 +37,7 @@ public class Config {
 
         // 检测配置文件是否存在
         // 目录
-        if (Files.exists(p)){
+        if (!Files.exists(p)){
             logger.info("config directory is not exists, creating ...");
             try {
                 Files.createDirectory(p);
