@@ -3,8 +3,17 @@ package com.bulefire.informationAPI.api.body;
 import java.util.List;
 
 public class QueryReturn {
+    private String message;
     private String player_number;
     private List<String> players;
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
 
     public String getPlayer_number() {
         return player_number;

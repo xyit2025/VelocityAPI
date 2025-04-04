@@ -3,7 +3,7 @@ Authorization: 123456789
 Content-Type: application/json
 
 {
-  "slice": "[2:3]"
+  "page": "[2:3]"
 }
 
 ###

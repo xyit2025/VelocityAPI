@@ -16,59 +16,46 @@ import org.slf4j.LoggerFactory;
 
 import java.sql.SQLException;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class HttpServer {
     private static final Logger logger = LoggerFactory.getLogger(HttpServer.class);
 
     public static Javalin app;
 
-    public static @Nullable QueryReturn query(@NotNull String slice){
+    public static @Nullable QueryReturn query(int page){
+        if (page < 0){
+            return null;
+        }
         int playerNumber = Config.server.getPlayerCount();
         List<String> players = new ArrayList<>();
         Collection<Player> rawPlayers = Config.server.getAllPlayers();
         for (Player player : rawPlayers){
             players.add(player.getUsername());
         }
-
-        int[] index = getIndex(slice);
-        if (index == null){
-            return null;
+        List<List<String>> l = partition(players, 10);
+        if (page >= l.size()){
+            QueryReturn q = new QueryReturn();
+            q.setMessage(String.valueOf(l.size()));
+            return q;
         }
-
-        players.subList(index[0],index[1]);
-
         QueryReturn q = new QueryReturn();
-        q.setPlayers(players);
+        q.setPlayers(l.get(page));
         q.setPlayer_number(String.valueOf(playerNumber));
         return q;
     }
 
-    private static int @Nullable [] getIndex(@NotNull String slice){
-        // 格式要求：[正整数:正整数] 且 start <= end
-        Pattern pattern =  Pattern.compile( "^\\[(?<start>(?!0+\\d)[1-9]\\d*):(?<end>(?!0+\\d)[1-9]\\d*)]$");
-        Matcher matcher = pattern.matcher(slice);
-        if (!matcher.matches()){
-            return null;
-        }
+    public static <T> List<List<T>> partition(@NotNull List<T> list, int partitionCount) {
+    int size = list.size();
+    int chunkSize = (int) Math.ceil((double) size / partitionCount);
+    return IntStream.range(0, partitionCount)
+            .mapToObj(i -> list.subList(
+                    i * chunkSize,
+                    Math.min((i + 1) * chunkSize, size)))
+            .collect(Collectors.toList());
+}
 
-        int[] indexes = new int[2];
-
-        try {
-            int start = Integer.parseInt(matcher.group("start"));
-            int end = Integer.parseInt(matcher.group("end"));
-            if (start >= 0 && end > start && end <= Config.server.getAllPlayers().size()){
-                indexes[0] = start;
-                indexes[1] = end;
-                return indexes;
-            }else {
-                return null;
-            }
-        } catch (NumberFormatException e) {
-            return null;
-        }
-    }
 
     public static @NotNull FindPlayerResult find_player(String name){
         FindPlayerResult result = new FindPlayerResult();

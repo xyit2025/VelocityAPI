@@ -11,7 +11,7 @@ plugins {
 }
 
 group = "com.bulefire"
-version = "1.0-release"
+version = "2.0-release"
 
 repositories {
     mavenCentral()

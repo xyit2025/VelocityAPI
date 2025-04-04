@@ -14,7 +14,7 @@ POST /vc/query
 请求参数
 ```json
 {
-  "slice": "[2:3]"
+  "page": "[2:3]"
 }
 ```
 示例返回
