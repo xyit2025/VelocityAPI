@@ -52,12 +52,23 @@ public class Config {
             // 初始化配置文件内容
             configJson.setPort(8080);
             configJson.setToken(new ArrayList<>(){});
+
             ConfigJson.Address address = new ConfigJson.Address();
             address.setBase("/vc");
             address.setQuery("/query");
             address.setFind_player("/find_player");
             address.setHh("/hh");
+            address.setBlind("/blind");
             configJson.setAddress(address);
+
+            ConfigJson.Database database = new ConfigJson.Database();
+            database.setUrl("jdbc:mysql://localhost:3306/player_db?serverTimezone=Asia/Shanghai");
+            database.setUsername("root");
+            database.setPassword("123456");
+            database.setPoolSize(10);
+            configJson.setDatabase(database);
+
+
             save();
         }else{
             loadFile();

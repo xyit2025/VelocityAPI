@@ -28,9 +28,13 @@ repositories {
 dependencies {
     compileOnly("com.velocitypowered:velocity-api:3.4.0-SNAPSHOT")
     annotationProcessor("com.velocitypowered:velocity-api:3.4.0-SNAPSHOT")
-    implementation("io.javalin:javalin:5.5.0")
+    implementation("io.javalin:javalin:6.5.0")
     implementation("org.yaml:snakeyaml:2.0")
     implementation("com.fasterxml.jackson.core:jackson-databind:2.15.0")
+    // MySQL驱动
+    implementation("mysql:mysql-connector-java:8.0.33")
+    // 连接池（可选）
+    implementation("com.zaxxer:HikariCP:5.0.1")
 
 }
 
@@ -57,6 +61,7 @@ tasks {
     named<ShadowJar>("shadowJar"){
         archiveClassifier.set("shadow")
         configurations = listOf(project.configurations.runtimeClasspath.get())
+        mergeServiceFiles()
     }
 }
 

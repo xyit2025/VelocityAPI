@@ -1,8 +1,13 @@
 package com.bulefire.informationAPI;
 
 import com.bulefire.informationAPI.api.Init;
+import com.bulefire.informationAPI.api.event.command.BlindCommand;
+import com.bulefire.informationAPI.api.event.command.DataBaseInit;
 import com.bulefire.informationAPI.config.Config;
+import com.bulefire.informationAPI.util.DatabaseUtil;
 import com.google.inject.Inject;
+import com.velocitypowered.api.command.CommandManager;
+import com.velocitypowered.api.command.CommandMeta;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.plugin.Plugin;
@@ -13,6 +18,7 @@ import org.slf4j.Logger;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.sql.SQLException;
 
 /***
  * ,--.         ,---.                                  ,--.  ,--.                 ,---.  ,------. ,--.
@@ -40,10 +46,26 @@ public class InformationAPI {
 
     @Subscribe
     public void onProxyInitialization(ProxyInitializeEvent event) throws IOException {
-        logger.info("[1/2]load config");
+        logger.info("[1/4]load config");
         Config.init(dataDirectory,server,container);
-        logger.info("[2/2]loading Http Server");
+        logger.info("[2/4]loading Http Server");
         Init.init();
+        logger.info("[3/4]loading Database");
+        try {
+            DataBaseInit.init();
+        } catch (SQLException e){
+            DatabaseUtil.handleDatabaseError(e,this.getClass());
+            logger.error(e.getMessage());
+            logger.error("load failed");
+            return;
+        }
+        logger.info("[4/4]loading Command");
+        CommandManager cm = server.getCommandManager();
+        CommandMeta meta = cm.metaBuilder("blind")
+                .aliases("bd")
+                .build();
+        cm.register(meta, new BlindCommand());
+
         print();
         logger.info("InformationAPI v" + BuildConstants.VERSION + " is loaded!");
     }
@@ -56,13 +78,13 @@ public class InformationAPI {
                 |  ||      \\|  `-,| .-. ||  .--'|        |' ,-.  |'-.  .-',--.| .-. ||      \\|  .-.  ||  '--' ||  |\s
                 |  ||  ||  ||  .-'' '-' '|  |   |  |  |  |\\ '-'  |  |  |  |  |' '-' '|  ||  ||  | |  ||  | --' |  |\s
                 `--'`--''--'`--'   `---' `--'   `--`--`--' `--`--'  `--'  `--' `---' `--''--'`--' `--'`--'     `--'\s
-                                                    ,---.                                                   ,---.  \s
-                           ,--.     ,--.      ,--.  |   |    ,--.                  ,--.          ,--.       |   |  \s
-                ,--.  ,--./   |    /    \\    /    \\ |  .'    |  | ,---.  ,--,--. ,-|  | ,---.  ,-|  | ,---. |  .'  \s
-                 \\  `'  / `|  |   |  ()  |  |  ()  ||  |     |  || .-. |' ,-.  |' .-. || .-. :' .-. || .-. :|  |   \s
-                  \\    /   |  |.--.\\    /.--.\\    / `--'     |  |' '-' '\\ '-'  |\\ `-' |\\   --.\\ `-' |\\   --.`--'   \s
-                   `--'    `--''--' `--' '--' `--'  .--.     `--' `---'  `--`--' `---'  `----' `---'  `----'.--.   \s
-                                                    '--'                                                    '--'  \s
+                                                      ,---.                                            ,---.\s
+                           ,---.      ,--.      ,--.  |   |    ,--.                  ,--.          ,--.|   |\s
+                ,--.  ,--.'.-.  \\    /    \\    /    \\ |  .'    |  | ,---.  ,--,--. ,-|  | ,---.  ,-|  ||  .'\s
+                 \\  `'  /  .-' .'   |  ()  |  |  ()  ||  |     |  || .-. |' ,-.  |' .-. || .-. :' .-. ||  | \s
+                  \\    /  /   '-..--.\\    /.--.\\    / `--'     |  |' '-' '\\ '-'  |\\ `-' |\\   --.\\ `-' |`--' \s
+                   `--'   '-----''--' `--' '--' `--'  .--.     `--' `---'  `--`--' `---'  `----' `---' .--. \s
+                                                      '--'                                             '--' \s
                 
                 """);
     }

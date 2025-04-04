@@ -1,10 +1,15 @@
 GET http://localhost:8080/vc/query
 Authorization: 123456789
+Content-Type: application/json
+
+{
+  "slice": "[2:3]"
+}
 
 ###
 
 POST http://localhost:8080/vc/find_player
-Authorization: 123456789
+Authorization: m7X9p2K4zR6Q3bA8
 Content-Type: application/json
 
 {
@@ -18,6 +23,17 @@ Authorization: 123456789
 Content-Type: application/json
 
 {
+  "qID":"ABCD123",
   "message": "hh"
 }
 
+###
+POST http://localhost:8080/vc/blind
+Authorization: 123456789
+Content-Type: application/json
+
+{
+
+  "qqID":"ABCD123",
+  "code": "D98N8VFD"
+}
