@@ -92,16 +92,22 @@ public class HttpServer {
 
     public static @NotNull String hh(@NotNull String qID, @NotNull String message) {
         String name;
+        String text;
         try {
             name = PlayerDAO.getUserName(qID);
         }catch (SQLNoFoundException e){
             logger.info("未找到与 QID {} 相关的用户", qID);
-            Config.server.sendMessage(Component.text("[全服喊话]<未知用户>"+message));
+            text = Config.getConfigJson().getFormat().replace("%username%","未知用户").replace("%message%",message);
+            Config.server.sendMessage(Component.text(text));
             return "200";
         }catch (SQLException e){
             return "500";
         }
-        Config.server.sendMessage(Component.text("[全服喊话]<"+ name +">"+message));
+        if (name == null){
+            return "500";
+        }
+        text = Config.getConfigJson().getFormat().replace("%username%",name).replace("%message%",message);
+        Config.server.sendMessage(Component.text(text));
         return "200";
     }
 

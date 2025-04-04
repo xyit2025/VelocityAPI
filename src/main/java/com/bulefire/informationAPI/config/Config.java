@@ -52,6 +52,7 @@ public class Config {
             // 初始化配置文件内容
             configJson.setPort(8080);
             configJson.setToken(new ArrayList<>(){});
+            configJson.setFormat("[来自Q群]<%username%>%message%");
 
             ConfigJson.Address address = new ConfigJson.Address();
             address.setBase("/vc");

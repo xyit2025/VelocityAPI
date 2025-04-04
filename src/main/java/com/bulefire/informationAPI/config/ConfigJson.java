@@ -7,6 +7,7 @@ public class ConfigJson {
     private List<String> token;
     private Address address;
     private Database database;
+    private String format;
 
     public static class Address {
         private String base;
@@ -125,5 +126,13 @@ public class ConfigJson {
 
     public void setAddress(Address address) {
         this.address = address;
+    }
+
+    public String getFormat() {
+        return format;
+    }
+
+    public void setFormat(String format) {
+        this.format = format;
     }
 }
