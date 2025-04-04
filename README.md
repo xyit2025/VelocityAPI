@@ -9,12 +9,23 @@ token 在配置文件里
 
 ## 查询所有玩家数量
 ````text
-GET /vc/query
+POST /vc/query
 ````
+请求参数
+```json
+{
+  "slice": "[2:3]"
+}
+```
 示例返回
 ```json
 {
-  "player_number":"123"
+  "player_number":"123",
+  "players": [
+    "player1",
+    "player2",
+    "player3"
+  ]
 }
 ```
 
@@ -43,8 +54,25 @@ POST /vc/hh
 请求参数
 ```json
 {
+  "qID": "qq ID",
   "message": "message"
 }
 ```
 返回
 ```200```
+
+## blind
+````text
+POST /vc/blind
+````
+
+请求参数
+```json
+{
+  "qID": "qq ID",
+  "code": "code"
+}
+```
+返回
+```200```
+```403```
