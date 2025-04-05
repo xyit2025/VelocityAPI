@@ -1,7 +1,7 @@
 package com.bulefire.informationAPI;
 
 import com.bulefire.informationAPI.api.Init;
-import com.bulefire.informationAPI.api.event.command.BlindCommand;
+import com.bulefire.informationAPI.api.event.command.BindCommand;
 import com.bulefire.informationAPI.api.event.command.DataBaseInit;
 import com.bulefire.informationAPI.config.Config;
 import com.bulefire.informationAPI.util.DatabaseUtil;
@@ -61,10 +61,10 @@ public class InformationAPI {
         }
         logger.info("[4/4]loading Command");
         CommandManager cm = server.getCommandManager();
-        CommandMeta meta = cm.metaBuilder("blind")
+        CommandMeta bdMeta = cm.metaBuilder("bind")
                 .aliases("bd")
                 .build();
-        cm.register(meta, new BlindCommand());
+        cm.register(bdMeta, new BindCommand());
 
         print();
         logger.info("InformationAPI v" + BuildConstants.VERSION + " is loaded!");

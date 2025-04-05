@@ -62,7 +62,7 @@ public class Init {
 
         // 注册接口
         // query
-        HttpServer.app.get(base+query, ctx -> {
+        HttpServer.app.post(base+query, ctx -> {
             logger.info("query called");
             if (!"application/json".equals(ctx.contentType())) {
                 ctx.status(415).json(UnsupportedMediaTypeErr);
@@ -80,18 +80,13 @@ public class Init {
 
             Gson g = new Gson();
             QueryBody q = g.fromJson(ctx.body(), QueryBody.class);
-            QueryReturn result = HttpServer.query(q.getPage());
+            QueryReturn result = HttpServer.query(q.getServer(), q.getPage());
             if (result == null){
-                logger.warn("query 请求被拒绝，原因：< 0");
-                ctx.status(HttpStatus.BAD_REQUEST).result("< 0");
+                logger.warn("query 请求被拒绝，原因：page < 0");
+                ctx.status(HttpStatus.BAD_REQUEST).result("page must be > 0 instead < 0");
                 return;
             }
             logger.info("query result is: {} {}", result.getPlayer_number(), result.getPlayers());
-            if (result.getMessage() != null){
-                logger.warn("query 请求被拒绝，原因：too big number");
-                ctx.status(HttpStatus.BAD_REQUEST).result("to big number");
-                return;
-            }
             ctx.status(200).json(result);
         });
         // find_player

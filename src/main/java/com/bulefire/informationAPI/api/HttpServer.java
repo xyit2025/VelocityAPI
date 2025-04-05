@@ -1,7 +1,7 @@
 package com.bulefire.informationAPI.api;
 
 import com.bulefire.informationAPI.api.body.QueryReturn;
-import com.bulefire.informationAPI.api.event.command.BlindCommand;
+import com.bulefire.informationAPI.api.event.command.BindCommand;
 import com.bulefire.informationAPI.api.event.command.PlayerDAO;
 import com.bulefire.informationAPI.api.event.command.SQLNoFoundException;
 import com.bulefire.informationAPI.api.result.FindPlayerResult;
@@ -16,6 +16,8 @@ import org.slf4j.LoggerFactory;
 
 import java.sql.SQLException;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -24,37 +26,64 @@ public class HttpServer {
 
     public static Javalin app;
 
-    public static @Nullable QueryReturn query(int page){
+    public static @Nullable QueryReturn query(@NotNull String server, int page){
         if (page < 0){
             return null;
         }
-        int playerNumber = Config.server.getPlayerCount();
-        List<String> players = new ArrayList<>();
-        Collection<Player> rawPlayers = Config.server.getAllPlayers();
-        for (Player player : rawPlayers){
-            players.add(player.getUsername());
-        }
-        List<List<String>> l = partition(players, 10);
-        if (page >= l.size()){
-            QueryReturn q = new QueryReturn();
-            q.setMessage(String.valueOf(l.size()));
-            return q;
-        }
+
+        AtomicInteger playerNumber = new AtomicInteger();
+        AtomicReference<List<List<String>>> l = new AtomicReference<>();
         QueryReturn q = new QueryReturn();
-        q.setPlayers(l.get(page));
-        q.setPlayer_number(String.valueOf(playerNumber));
+
+        if (server.equals("all")){
+            playerNumber.set(Config.server.getPlayerCount());
+            List<String> players = new ArrayList<>();
+            Collection<Player> rawPlayers = Config.server.getAllPlayers();
+            for (Player player : rawPlayers){
+                players.add(player.getUsername());
+            }
+            l.set(partition(players, 10));
+            q.setTotalPage(l.get().size());
+        }else {
+            Config.server.getAllServers().forEach(serverInfo -> {
+                if (serverInfo.getServerInfo().getName().equals(server)){
+                    playerNumber.set(serverInfo.getPlayersConnected().size());
+                    List<String> players = new ArrayList<>();
+                    serverInfo.getPlayersConnected().forEach(player -> players.add(player.getUsername()));
+                    l.set(partition(players, 10));
+                    q.setTotalPage(l.get().size());
+                }
+            });
+        }
+        if (!(l.get() == null)) {
+            if (l.get().isEmpty()){
+                q.setTotalPage(0);
+                q.setPlayers(null);
+            }else if (!(page > l.get().size())) {
+                q.setPlayers(l.get().get(page));
+            } else {
+                q.setPlayers(null);
+            }
+        }else {
+            q.setPlayers(null);
+            q.setTotalPage(-1);
+            q.setPlayer_number(-1);
+        }
+        q.setPlayer_number(playerNumber.get());
         return q;
     }
 
-    public static <T> List<List<T>> partition(@NotNull List<T> list, int partitionCount) {
-    int size = list.size();
-    int chunkSize = (int) Math.ceil((double) size / partitionCount);
-    return IntStream.range(0, partitionCount)
-            .mapToObj(i -> list.subList(
-                    i * chunkSize,
-                    Math.min((i + 1) * chunkSize, size)))
-            .collect(Collectors.toList());
-}
+    public static <T> List<List<T>> partition(@NotNull List<T> list, int chunkSize) {
+        int size = list.size();
+        // 计算实际需要的分区数量（向上取整）
+        int partitionCount = (int) Math.ceil((double) size / chunkSize);
+
+        return IntStream.range(0, partitionCount)
+                .mapToObj(i -> list.subList(
+                        i * chunkSize,
+                        Math.min((i + 1) * chunkSize, size)))
+                .collect(Collectors.toList());
+    }
 
 
     public static @NotNull FindPlayerResult find_player(String name){
@@ -81,16 +110,14 @@ public class HttpServer {
         String name;
         String text;
         try {
-            name = PlayerDAO.getUserName(qID);
+            name = PlayerDAO.getUserNameByQID(qID);
         }catch (SQLNoFoundException e){
             logger.info("未找到与 QID {} 相关的用户", qID);
             text = Config.getConfigJson().getFormat().replace("%username%","未知用户").replace("%message%",message);
             Config.server.sendMessage(Component.text(text));
             return "200";
         }catch (SQLException e){
-            return "500";
-        }
-        if (name == null){
+            logger.error("数据库错误", e);
             return "500";
         }
         text = Config.getConfigJson().getFormat().replace("%username%",name).replace("%message%",message);
@@ -100,12 +127,14 @@ public class HttpServer {
 
     public static boolean blind(@NotNull String qID, @NotNull String code){
         logger.info("qID: {} code: {}", qID, code);
-        BlindCommand.Result result = BlindCommand.blind(code);
+        BindCommand.Result result = BindCommand.blind(code);
         if (!result.valid){
             logger.info("验证码错误");
             return false;
         }
         UUID uuid = result.uuid;
+        Optional<Player> player = Config.server.getPlayer(uuid);
+        player.ifPresent(value -> value.sendMessage(Component.text("验证成功")));
         saveToDataBase(qID,uuid,result.username);
         return true;
     }

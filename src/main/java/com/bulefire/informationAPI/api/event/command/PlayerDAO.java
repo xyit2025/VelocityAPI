@@ -33,7 +33,7 @@ public class PlayerDAO {
         logger.info("验证信息保存成功！");
     }
 
-    public static @NotNull UUID getUserUUID(@NotNull String qID) throws SQLException,SQLNoFoundException {
+    public static @NotNull UUID getUserUUIDByQID(@NotNull String qID) throws SQLException {
         String sql = "SELECT uuid FROM playerqu WHERE qid = ?";
 
         try (Connection conn = DatabaseUtil.getConnection();
@@ -52,7 +52,7 @@ public class PlayerDAO {
         throw new SQLNoFoundException("未找到与 QID " + qID + " 相关的用户");
     }
 
-    public static @Nullable String getUserName(@NotNull String qID) throws SQLException,SQLNoFoundException {
+    public static @NotNull String getUserNameByQID(@NotNull String qID) throws SQLException {
         String sql = "SELECT username FROM playerqu WHERE qid = ?";
 
         try (Connection conn = DatabaseUtil.getConnection();
@@ -65,10 +65,45 @@ public class PlayerDAO {
                     return rs.getString("username");
                 }
             }
-        } catch (SQLException e) {
-            DatabaseUtil.handleDatabaseError(e, PlayerDAO.class);
-            throw e; // 向上抛出异常供调用方处理
         }
         throw new SQLNoFoundException("未找到与 QID " + qID + " 相关的用户");
+    }
+
+    public static @Nullable String getQIDByUUID(@NotNull UUID uuid) throws SQLException {
+        String sql = "SELECT qid FROM playerqu WHERE uuid = ?";
+        try (Connection conn = DatabaseUtil.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, uuid.toString());
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getString("qid");
+                }
+            }
+        }
+        return null;
+    }
+
+    public static void deleteByUUID(@NotNull UUID uuid) throws SQLException {
+        String sql = "DELETE FROM playerqu WHERE uuid = ?";
+        try (Connection conn = DatabaseUtil.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, uuid.toString());
+            pstmt.executeUpdate();
+        }
+    }
+
+    public static @Nullable String getUserNameByUUID(@NotNull UUID uuid) throws SQLException {
+        String sql = "SELECT username FROM playerqu WHERE uuid = ?";
+        try (Connection conn = DatabaseUtil.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, uuid.toString());
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getString("username");
+                }
+            }
+        }
+        return null;
     }
 }

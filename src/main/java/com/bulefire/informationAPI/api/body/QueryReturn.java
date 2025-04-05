@@ -3,23 +3,23 @@ package com.bulefire.informationAPI.api.body;
 import java.util.List;
 
 public class QueryReturn {
-    private String message;
-    private String player_number;
+    private int player_number;
     private List<String> players;
+    private int totalPage;
 
-    public String getMessage() {
-        return message;
+    public int getTotalPage() {
+        return totalPage;
     }
 
-    public void setMessage(String message) {
-        this.message = message;
+    public void setTotalPage(int totalPage) {
+        this.totalPage = totalPage;
     }
 
-    public String getPlayer_number() {
+    public int getPlayer_number() {
         return player_number;
     }
 
-    public void setPlayer_number(String player_number) {
+    public void setPlayer_number(int player_number) {
         this.player_number = player_number;
     }
 

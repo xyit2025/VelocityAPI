@@ -1,15 +1,16 @@
-GET http://localhost:8080/vc/query
+POST http://localhost:8080/vc/query
 Authorization: 123456789
 Content-Type: application/json
 
 {
-  "page": "[2:3]"
+  "server": "all",
+  "page": 0
 }
 
 ###
 
 POST http://localhost:8080/vc/find_player
-Authorization: m7X9p2K4zR6Q3bA8
+Authorization: 123456789
 Content-Type: application/json
 
 {
@@ -23,7 +24,7 @@ Authorization: 123456789
 Content-Type: application/json
 
 {
-  "qID":"ABCD123",
+  "qID":"ABC123",
   "message": "hh"
 }
 
@@ -34,6 +35,6 @@ Content-Type: application/json
 
 {
 
-  "qqID":"ABCD123",
-  "code": "D98N8VFD"
+  "qqID":"ABC123",
+  "code": "74Y68U9X"
 }

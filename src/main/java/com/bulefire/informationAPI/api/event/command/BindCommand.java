@@ -10,12 +10,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.security.SecureRandom;
+import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-public class BlindCommand implements SimpleCommand {
-    private static final Logger logger = LoggerFactory.getLogger(BlindCommand.class);
+public class BindCommand implements SimpleCommand {
+    private static final Logger logger = LoggerFactory.getLogger(BindCommand.class);
 
     private static final Result failed = new Result(false,null,null);
 
@@ -31,7 +36,7 @@ public class BlindCommand implements SimpleCommand {
         // 每10分钟清理过期验证码
         scheduler.scheduleAtFixedRate(() -> {
             long now = System.currentTimeMillis();
-            BlindCommand.CODE_CACHE.entrySet().removeIf(entry ->
+            BindCommand.CODE_CACHE.entrySet().removeIf(entry ->
                     (now - entry.getValue().timestamp) > 300_000
             );
             logger.info("清理过期验证码");
@@ -46,18 +51,72 @@ public class BlindCommand implements SimpleCommand {
     @Override
     public void execute(@NotNull Invocation invocation) {
         CommandSource source = invocation.source();
-        //String[] args = invocation.arguments();
+        String[] args = invocation.arguments();
 
-        if (source instanceof Player player){
-            UUID uuid = player.getUniqueId();
+        if (source instanceof Player player) {
+            if (args.length < 1) {
+                // 绑定过的不能二次绑定
+                String n;
+                String u;
+                try {
+                    n = PlayerDAO.getUserNameByUUID(player.getUniqueId());
+                    u = PlayerDAO.getQIDByUUID(player.getUniqueId());
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+                if (n != null && n.equals(player.getUsername()) && u != null){
+                    player.sendMessage(Component.text("您已经绑定了 " + u));
+                    return;
+                }
 
-            String code = generateSecureCode();
-            // 存入缓存（5分钟有效期）
-            CODE_CACHE.put(code, new CodeInfo(uuid, System.currentTimeMillis(),player.getUsername()));
+                // 判断是否已经发送过验证码 60s 可以发一次
+                boolean exists = CODE_CACHE.entrySet().stream()
+                        .anyMatch(entry -> {
+                            if (entry.getValue().username.equals(player.getUsername())) {
+                                // 判断是否在60s内
+                                return ((System.currentTimeMillis() - entry.getValue().timestamp) < 60_000);
+                            }
+                            return false;
+                        });
 
-            logger.info("player {} get code {}",uuid,code);
+                if (exists) {
+                    player.sendMessage(Component.text("已经发送过了"));
+                    return;
+                }
 
-            player.sendMessage(Component.text("您的验证码是" + code +"\n 有效期5分钟,请前往qq端验证"));
+                // 生成验证码
+                UUID uuid = player.getUniqueId();
+
+                String code = generateSecureCode();
+                // 存入缓存（5分钟有效期）
+                CODE_CACHE.put(code, new CodeInfo(uuid, System.currentTimeMillis(), player.getUsername()));
+
+                logger.info("player {} get code {}", uuid, code);
+
+                player.sendMessage(Component.text("您的验证码是" + code + "\n 有效期5分钟,请前往qq端验证"));
+            }
+            else if (args[0].equals("search")) {
+                String QID;
+                try {
+                    QID = PlayerDAO.getQIDByUUID(player.getUniqueId());
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+
+                if (QID != null) {
+                    player.sendMessage(Component.text("已绑定 " + QID));
+                } else {
+                    player.sendMessage(Component.text("未绑定 QQ"));
+                }
+            }
+            else if (args[0].equals("un")) {
+                try {
+                    PlayerDAO.deleteByUUID(player.getUniqueId());
+                    player.sendMessage(Component.text("解绑成功"));
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+            }
         }
     }
 
@@ -81,8 +140,22 @@ public class BlindCommand implements SimpleCommand {
      * @return the tab complete suggestions
      */
     @Override
-    public List<String> suggest(Invocation invocation) {
-        return SimpleCommand.super.suggest(invocation);
+    public List<String> suggest(@NotNull Invocation invocation) {
+        String[] args = invocation.arguments();
+
+        // 第一个参数提示子命令
+        if (args.length == 0) {
+            return Arrays.asList("search", "un");
+        }
+
+        // 子命令的自动补全
+        if (args.length == 1) {
+            return Stream.of("search", "un")
+                    .filter(s -> s.startsWith(args[0].toLowerCase()))
+                    .collect(Collectors.toList());
+        }
+
+        return Collections.emptyList();
     }
 
     /**
@@ -93,8 +166,8 @@ public class BlindCommand implements SimpleCommand {
      * @implSpec defaults to wrapping the value returned by {@link #suggest(Invocation)}
      */
     @Override
-    public CompletableFuture<List<String>> suggestAsync(Invocation invocation) {
-        return SimpleCommand.super.suggestAsync(invocation);
+    public CompletableFuture<List<String>> suggestAsync(@NotNull Invocation invocation) {
+        return CompletableFuture.completedFuture(suggest(invocation));
     }
 
     /**
@@ -141,7 +214,7 @@ public class BlindCommand implements SimpleCommand {
     }
     @Contract("_ -> new")
     public static @NotNull Result blind(@NotNull String code) {
-        CodeInfo info = BlindCommand.CODE_CACHE.get(code);
+        CodeInfo info = BindCommand.CODE_CACHE.get(code);
 
         // 验证码不存在
         if (info == null)
@@ -161,7 +234,7 @@ public class BlindCommand implements SimpleCommand {
         }
 
         // 无论是否通过都移除验证码（一次性使用）
-        BlindCommand.CODE_CACHE.remove(code);
+        BindCommand.CODE_CACHE.remove(code);
         return new Result(true,info.uuid,info.username);
     }
 }

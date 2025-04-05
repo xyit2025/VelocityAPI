@@ -14,12 +14,14 @@ POST /vc/query
 请求参数
 ```json
 {
+  "server": "server name",
   "page": "0"
 }
 ```
 示例返回
 ```json
 {
+  "total_page": "int page",
   "player_number":"123",
   "players": [
     "player1",
