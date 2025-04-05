@@ -56,14 +56,14 @@ POST /vc/hh
 请求参数
 ```json
 {
-  "qID": "qq ID",
+  "qqID": "qq ID",
   "message": "message"
 }
 ```
 返回
 ```200```
 
-## blind
+## bind
 ````text
 POST /vc/blind
 ````
@@ -71,7 +71,7 @@ POST /vc/blind
 请求参数
 ```json
 {
-  "qID": "qq ID",
+  "qqID": "qq ID",
   "code": "code"
 }
 ```
