@@ -1,0 +1,40 @@
+POST http://220.231.146.76:8081/vc/query
+Authorization: m7X9p2K4zR6Q3bA8
+Content-Type: application/json
+
+{
+  "server": "all",
+  "page": 0
+}
+
+###
+
+POST http://220.231.146.76:8081/vc/find_player
+Authorization: m7X9p2K4zR6Q3bA8
+Content-Type: application/json
+
+{
+  "name": "bulefire_fox"
+}
+
+###
+
+POST http://220.231.146.76:8081/vc/hh
+Authorization: m7X9p2K4zR6Q3bA8
+Content-Type: application/json
+
+{
+  "qID":"ABC123",
+  "message": "hh"
+}
+
+###
+POST http://220.231.146.76:8081/vc/blind
+Authorization: m7X9p2K4zR6Q3bA8
+Content-Type: application/json
+
+{
+
+  "qqID":"ABC123",
+  "code": "SATXXHES"
+}

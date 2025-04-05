@@ -24,7 +24,7 @@ public class DataBaseInit {
 
             DatabaseMetaData metaData = conn.getMetaData();
 
-            String tableName = "playerQU";
+            String tableName = "playerqu";
             ResultSet tables = metaData.getTables(
                     null,
                     null,
@@ -35,7 +35,7 @@ public class DataBaseInit {
             if (!tables.next()) {
                 logger.info("表不存在，正在创建表...");
                 // 执行建表SQL（示例表结构，需按实际需求修改）
-                String createTableSQL = "CREATE TABLE playerQU (" +
+                String createTableSQL = "CREATE TABLE playerqu (" +
                         "qid VARCHAR(255) NOT NULL PRIMARY KEY," +
                         "uuid VARCHAR(36) NOT NULL, " +
                         "username VARCHAR(255) NOT NULL"+

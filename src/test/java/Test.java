@@ -11,13 +11,17 @@ public class Test {
 //        testEdgeCases();
 //        testNormalCase();
 //        testSizeBasedPartition();
-        List<String> l = new ArrayList<>();
-        for (int i = 0; i <= 100; i++) {
-            l.add(String.valueOf(i));
-        }
-        List<List<String>> l1 = partition(l,10);
-        System.out.println(l1);
+//        List<String> l = new ArrayList<>();
+//        for (int i = 0; i <= 100; i++) {
+//            l.add(String.valueOf(i));
+//        }
+//        List<List<String>> l1 = partition(l,10);
+//        System.out.println(l1);
+        a(1,2,3,4,5,6);
+
     }
+
+    public static void a(int ... a){}
 
     public static <T> List<List<T>> partition(@NotNull List<T> list, int chunkSize) {
         int size = list.size();
