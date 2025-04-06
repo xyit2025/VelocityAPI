@@ -59,7 +59,7 @@ public class HttpServer {
             if (l.get().isEmpty()){
                 q.setTotalPage(0);
                 q.setPlayers(null);
-            }else if (!(page > l.get().size())) {
+            }else if (!(page > (l.get().size()-1))) {
                 q.setPlayers(l.get().get(page));
             } else {
                 q.setPlayers(null);
