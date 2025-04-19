@@ -1,4 +1,4 @@
-package com.bulefire.informationAPI.api.event.command;
+package com.bulefire.informationAPI.datdabase;
 
 import java.sql.SQLException;
 

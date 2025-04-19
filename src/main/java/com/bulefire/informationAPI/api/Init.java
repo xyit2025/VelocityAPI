@@ -9,6 +9,7 @@ import io.javalin.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -132,7 +133,16 @@ public class Init {
             HhBody b = g.fromJson(ctx.body(), HhBody.class);
             String result = HttpServer.hh(b.getqID(),b.getMessage());
             logger.info("hh result is: {}", result);
-            ctx.status(Integer.parseInt(result));
+
+            if (!result.contains("|")){
+                ctx.status(Integer.parseInt(result));
+                ctx.result(result);
+                return;
+            }
+
+            String[] rr = result.split("\\|");
+            logger.debug(Arrays.toString(rr));
+            ctx.status(Integer.parseInt(rr[0].replace(" ",""))).result(rr[1]);
         });
 
         // blind

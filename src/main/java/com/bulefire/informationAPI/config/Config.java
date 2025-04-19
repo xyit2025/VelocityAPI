@@ -25,12 +25,16 @@ public class Config {
     private static Path configFile;
     private static ConfigJson configJson;
 
+    public static Path root;
+
     public static void init(@NotNull Path p, @NotNull ProxyServer servers, @NotNull PluginContainer containers) throws IOException {
         server = servers;
         container = containers;
 
         configJson = new ConfigJson();
         configFile = p.resolve("config.json");
+
+        root = p;
 
         logger.info("config directory: {}", p);
         logger.info("config file: {}", configFile);

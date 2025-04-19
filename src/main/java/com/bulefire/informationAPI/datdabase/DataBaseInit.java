@@ -1,6 +1,5 @@
-package com.bulefire.informationAPI.api.event.command;
+package com.bulefire.informationAPI.datdabase;
 
-import com.bulefire.informationAPI.util.DatabaseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,11 +33,12 @@ public class DataBaseInit {
 
             if (!tables.next()) {
                 logger.info("表不存在，正在创建表...");
-                // 执行建表SQL（示例表结构，需按实际需求修改）
+                // 执行建表SQL）
                 String createTableSQL = "CREATE TABLE playerqu (" +
                         "qid VARCHAR(255) NOT NULL PRIMARY KEY," +
                         "uuid VARCHAR(36) NOT NULL, " +
-                        "username VARCHAR(255) NOT NULL"+
+                        "username VARCHAR(255) NOT NULL,"+
+                        "shout INT NOT NULL DEFAULT 0" +
                         ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4";
 
                 stmt.executeUpdate(createTableSQL);

@@ -1,24 +1,31 @@
 package com.bulefire.informationAPI;
 
 import com.bulefire.informationAPI.api.Init;
-import com.bulefire.informationAPI.api.event.command.BindCommand;
-import com.bulefire.informationAPI.api.event.command.DataBaseInit;
+import com.bulefire.informationAPI.command.Register;
+import com.bulefire.informationAPI.datdabase.DataBaseInit;
 import com.bulefire.informationAPI.config.Config;
-import com.bulefire.informationAPI.util.DatabaseUtil;
+import com.bulefire.informationAPI.datdabase.DatabaseUtil;
 import com.google.inject.Inject;
-import com.velocitypowered.api.command.CommandManager;
-import com.velocitypowered.api.command.CommandMeta;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.plugin.PluginContainer;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.ProxyServer;
+import net.kyori.adventure.key.Key;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.translation.GlobalTranslator;
+import net.kyori.adventure.translation.TranslationRegistry;
 import org.slf4j.Logger;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.sql.SQLException;
+import java.text.MessageFormat;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 
 /***
  * ,--.         ,---.                                  ,--.  ,--.                 ,---.  ,------. ,--.
@@ -42,7 +49,7 @@ public class InformationAPI {
 
     @Inject
     @DataDirectory
-    private Path dataDirectory;
+    public Path dataDirectory;
 
     @Subscribe
     public void onProxyInitialization(ProxyInitializeEvent event) throws IOException {
@@ -60,14 +67,20 @@ public class InformationAPI {
             return;
         }
         logger.info("[4/4]loading Command");
-        CommandManager cm = server.getCommandManager();
-        CommandMeta bdMeta = cm.metaBuilder("bind")
-                .aliases("bd")
-                .build();
-        cm.register(bdMeta, new BindCommand());
+        Register.register(server);
 
         print();
+        t();
         logger.info("InformationAPI v" + BuildConstants.VERSION + " is loaded!");
+    }
+
+    public static void  t(){
+        GlobalTranslator registry = GlobalTranslator.translator();
+        TranslationRegistry r = TranslationRegistry.create(Key.key("informationapi"));
+        Map<String, MessageFormat> translations = new HashMap<>();
+        translations.put("informationapi.bind", new MessageFormat("bind!!!!!!!! {0}"));
+        r.registerAll(Locale.CHINA,translations);
+        registry.addSource(r);
     }
 
     private void print(){

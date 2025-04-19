@@ -1,9 +1,9 @@
 package com.bulefire.informationAPI.api;
 
 import com.bulefire.informationAPI.api.body.QueryReturn;
-import com.bulefire.informationAPI.api.event.command.BindCommand;
-import com.bulefire.informationAPI.api.event.command.PlayerDAO;
-import com.bulefire.informationAPI.api.event.command.SQLNoFoundException;
+import com.bulefire.informationAPI.command.bind.BindCommand;
+import com.bulefire.informationAPI.datdabase.PlayerDAO;
+import com.bulefire.informationAPI.datdabase.SQLNoFoundException;
 import com.bulefire.informationAPI.api.result.FindPlayerResult;
 import com.bulefire.informationAPI.config.Config;
 import com.velocitypowered.api.proxy.Player;
@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 
 import java.sql.SQLException;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
@@ -25,6 +26,9 @@ public class HttpServer {
     private static final Logger logger = LoggerFactory.getLogger(HttpServer.class);
 
     public static Javalin app;
+
+    private static final Map<String, Long> cooldownMap = new ConcurrentHashMap<>();
+    private static final long COOLDOWN_TIME = 5_000; // 5s间隔
 
     public static @Nullable QueryReturn query(@NotNull String server, int page){
         if (page < 0){
@@ -107,22 +111,31 @@ public class HttpServer {
     }
 
     public static @NotNull String hh(@NotNull String qID, @NotNull String message) {
+        Long lastCall = cooldownMap.get(qID);
+        if (lastCall != null && System.currentTimeMillis() - lastCall < COOLDOWN_TIME) {
+            return "429 | " + (COOLDOWN_TIME-(System.currentTimeMillis() - lastCall));
+        }
         String name;
+        int shout;
         String text;
         try {
             name = PlayerDAO.getUserNameByQID(qID);
+            shout = PlayerDAO.getShoutByQID(qID);
+            if (shout <= 0){
+                return "409";
+            }
+            text = Config.getConfigJson().getFormat().replace("%username%",name).replace("%message%",message);
+            Config.server.sendMessage(Component.text(text));
+            PlayerDAO.updateShoutByQID(qID,shout-1);
         }catch (SQLNoFoundException e){
             logger.info("未找到与 QID {} 相关的用户", qID);
-            text = Config.getConfigJson().getFormat().replace("%username%","未知用户").replace("%message%",message);
-            Config.server.sendMessage(Component.text(text));
-            return "200";
+            return "403";
         }catch (SQLException e){
             logger.error("数据库错误", e);
             return "500";
         }
-        text = Config.getConfigJson().getFormat().replace("%username%",name).replace("%message%",message);
-        Config.server.sendMessage(Component.text(text));
-        return "200";
+        cooldownMap.put(qID, System.currentTimeMillis());
+        return "200 | " + shout;
     }
 
     public static boolean blind(@NotNull String qID, @NotNull String code){

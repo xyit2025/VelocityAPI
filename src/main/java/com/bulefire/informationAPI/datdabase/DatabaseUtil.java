@@ -1,4 +1,4 @@
-package com.bulefire.informationAPI.util;
+package com.bulefire.informationAPI.datdabase;
 
 import com.bulefire.informationAPI.config.DataBaseConfig;
 import com.zaxxer.hikari.HikariConfig;

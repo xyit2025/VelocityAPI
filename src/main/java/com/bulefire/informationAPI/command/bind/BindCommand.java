@@ -1,5 +1,6 @@
-package com.bulefire.informationAPI.api.event.command;
+package com.bulefire.informationAPI.command.bind;
 
+import com.bulefire.informationAPI.datdabase.PlayerDAO;
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.command.SimpleCommand;
 import com.velocitypowered.api.proxy.Player;
