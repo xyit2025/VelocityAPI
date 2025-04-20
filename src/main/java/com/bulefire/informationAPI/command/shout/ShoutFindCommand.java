@@ -17,14 +17,24 @@ import java.util.concurrent.CompletableFuture;
 public class ShoutFindCommand implements SimpleCommand {
     @Override
     public void execute(@NotNull Invocation invocation) {
+        String[] args = invocation.arguments();
         if (invocation.source() instanceof Player player){
-            int shout = PlayerDAO.getShoutByName(player.getUsername());
-            if (shout == -2){
-                player.sendMessage(Component.text("您还没有绑定过 QQ"));
-                return;
+            if (args.length == 1){
+                int shout = PlayerDAO.getShoutByName(player.getUsername());
+                if (shout == -2){
+                    player.sendMessage(Component.translatable("shout.find.bind.qq.not"));
+                    return;
+                }
+                invocation.source().sendMessage(Component.translatable("shout.find.message").arguments(Component.text(shout)));
+            }else {
+                String name = args[1];
+                int shout = PlayerDAO.getShoutByName(name);
+                if (shout == -2){
+                    player.sendMessage(Component.translatable("shout.find.bind.qq.not"));
+                    return;
+                }
+                invocation.source().sendMessage(Component.translatable("shout.find.name.message").arguments(Component.text(name), Component.text(shout)));
             }
-            invocation.source().sendMessage(Component.text("Your shout is " + shout));
-            invocation.source().sendMessage(Component.translatable("informationapi.bind").arguments(Component.text(shout)));
         }
     }
 

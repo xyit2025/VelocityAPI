@@ -5,6 +5,7 @@ import com.bulefire.informationAPI.command.Register;
 import com.bulefire.informationAPI.datdabase.DataBaseInit;
 import com.bulefire.informationAPI.config.Config;
 import com.bulefire.informationAPI.datdabase.DatabaseUtil;
+import com.bulefire.informationAPI.languages.FileInit;
 import com.google.inject.Inject;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.event.Subscribe;
@@ -55,9 +56,11 @@ public class InformationAPI {
     public void onProxyInitialization(ProxyInitializeEvent event) throws IOException {
         logger.info("[1/4]load config");
         Config.init(dataDirectory,server,container);
-        logger.info("[2/4]loading Http Server");
+        logger.info("[2/5]loading languages");
+        FileInit.init();
+        logger.info("[3/5]loading Http Server");
         Init.init();
-        logger.info("[3/4]loading Database");
+        logger.info("[4/5]loading Database");
         try {
             DataBaseInit.init();
         } catch (SQLException e){
@@ -66,7 +69,7 @@ public class InformationAPI {
             logger.error("load failed");
             return;
         }
-        logger.info("[4/4]loading Command");
+        logger.info("[5/5]loading Command");
         Register.register(server);
 
         print();

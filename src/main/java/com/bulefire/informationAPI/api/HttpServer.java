@@ -28,7 +28,7 @@ public class HttpServer {
     public static Javalin app;
 
     private static final Map<String, Long> cooldownMap = new ConcurrentHashMap<>();
-    private static final long COOLDOWN_TIME = 5_000; // 5s间隔
+    private static final long COOLDOWN_TIME = Config.getConfigJson().getCooldownTime(); // 5s间隔
 
     public static @Nullable QueryReturn query(@NotNull String server, int page){
         if (page < 0){
@@ -124,8 +124,7 @@ public class HttpServer {
             if (shout <= 0){
                 return "409";
             }
-            text = Config.getConfigJson().getFormat().replace("%username%",name).replace("%message%",message);
-            Config.server.sendMessage(Component.text(text));
+            Config.server.sendMessage(Component.translatable("hh.server_show.format").arguments(Component.text(name), Component.text(message)));
             PlayerDAO.updateShoutByQID(qID,shout-1);
         }catch (SQLNoFoundException e){
             logger.info("未找到与 QID {} 相关的用户", qID);
@@ -147,7 +146,7 @@ public class HttpServer {
         }
         UUID uuid = result.uuid;
         Optional<Player> player = Config.server.getPlayer(uuid);
-        player.ifPresent(value -> value.sendMessage(Component.text("验证成功")));
+        player.ifPresent(value -> value.sendMessage(Component.translatable("验证成功")));
         saveToDataBase(qID,uuid,result.username);
         return true;
     }

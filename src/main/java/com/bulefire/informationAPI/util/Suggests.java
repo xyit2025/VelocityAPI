@@ -14,12 +14,12 @@ public class Suggests {
     public static List<String> getPlayerNameSuggest(@NotNull SimpleCommand.Invocation invocation, ProxyServer proxyServer) {
         String[] args = invocation.arguments();
 
-        if (args.length == 0) {
+        if (args.length == 1) {
             return proxyServer.getAllPlayers().stream()
                     .map(Player::getUsername)
                     .collect(Collectors.toList());
-        }else if (args.length == 1) {
-            String input = args[0].toLowerCase();
+        }else if (args.length == 2) {
+            String input = args[1].toLowerCase();
             if (input.isEmpty()){
                 return proxyServer.getAllPlayers().stream()
                         .map(Player::getUsername)

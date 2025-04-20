@@ -23,17 +23,17 @@ public class ShoutSetCommand implements SimpleCommand {
     @Override
     public void execute(@NotNull Invocation invocation) {
         String[] args = invocation.arguments();
-        if (args.length != 2) {
-            invocation.source().sendMessage(Component.text("/set <name> <number>"));
+        if (args.length != 3) {
+            invocation.source().sendMessage(Component.translatable("shout.set.help.message"));
         }
-        String playerName = args[0];
-        int shout = Integer.parseInt(args[1]);
+        String playerName = args[1];
+        int shout = Integer.parseInt(args[2]);
         if (shout < 0){
-            invocation.source().sendMessage(Component.text("Shout can't be negative"));
+            invocation.source().sendMessage(Component.translatable("shout.set.error.negative"));
             return;
         }
         PlayerDAO.updateShoutByName(playerName, shout);
-        invocation.source().sendMessage(Component.text("Set shout of " + playerName + " to " + shout + " successfully"));
+        invocation.source().sendMessage(Component.translatable("shout.set.successful").arguments(Component.text(playerName), Component.text(shout)));
     }
 
     @Override

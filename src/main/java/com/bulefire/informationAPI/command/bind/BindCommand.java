@@ -44,11 +44,6 @@ public class BindCommand implements SimpleCommand {
         }, 10, 10, TimeUnit.MINUTES);
     }
 
-    /**
-     * Executes the command for the specified invocation.
-     *
-     * @param invocation the invocation context
-     */
     @Override
     public void execute(@NotNull Invocation invocation) {
         CommandSource source = invocation.source();
@@ -66,7 +61,7 @@ public class BindCommand implements SimpleCommand {
                     throw new RuntimeException(e);
                 }
                 if (n != null && n.equals(player.getUsername()) && u != null){
-                    player.sendMessage(Component.text("您已经绑定了 " + u));
+                    player.sendMessage(Component.translatable("bind.message.already.bind").arguments(Component.text(u)));
                     return;
                 }
 
@@ -81,7 +76,7 @@ public class BindCommand implements SimpleCommand {
                         });
 
                 if (exists) {
-                    player.sendMessage(Component.text("已经发送过了"));
+                    player.sendMessage(Component.translatable("bind.message.already.send"));
                     return;
                 }
 
@@ -94,7 +89,7 @@ public class BindCommand implements SimpleCommand {
 
                 logger.info("player {} get code {}", uuid, code);
 
-                player.sendMessage(Component.text("您的验证码是" + code + "\n 有效期5分钟,请前往qq端验证"));
+                player.sendMessage(Component.translatable("bind.message.send.code").arguments(Component.text(code)));
             }
             else if (args[0].equals("search")) {
                 String QID;
@@ -105,15 +100,15 @@ public class BindCommand implements SimpleCommand {
                 }
 
                 if (QID != null) {
-                    player.sendMessage(Component.text("已绑定 " + QID));
+                    player.sendMessage(Component.translatable("bind.message.search.qq.already").arguments(Component.text(QID)));
                 } else {
-                    player.sendMessage(Component.text("未绑定 QQ"));
+                    player.sendMessage(Component.translatable("bind.message.search.qq.not"));
                 }
             }
             else if (args[0].equals("un")) {
                 try {
                     PlayerDAO.deleteByUUID(player.getUniqueId());
-                    player.sendMessage(Component.text("解绑成功"));
+                    player.sendMessage(Component.translatable("bind.message.unbind.success"));
                 } catch (SQLException e) {
                     throw new RuntimeException(e);
                 }
@@ -134,12 +129,6 @@ public class BindCommand implements SimpleCommand {
         return new String(code);
     }
 
-    /**
-     * Provides tab complete suggestions for the specified invocation.
-     *
-     * @param invocation the invocation context
-     * @return the tab complete suggestions
-     */
     @Override
     public List<String> suggest(@NotNull Invocation invocation) {
         String[] args = invocation.arguments();
@@ -159,27 +148,11 @@ public class BindCommand implements SimpleCommand {
         return Collections.emptyList();
     }
 
-    /**
-     * Provides tab complete suggestions for the specified invocation.
-     *
-     * @param invocation the invocation context
-     * @return the tab complete suggestions
-     * @implSpec defaults to wrapping the value returned by {@link #suggest(Invocation)}
-     */
     @Override
     public CompletableFuture<List<String>> suggestAsync(@NotNull Invocation invocation) {
         return CompletableFuture.completedFuture(suggest(invocation));
     }
 
-    /**
-     * Tests to check if the source has permission to perform the specified invocation.
-     *
-     * <p>If the method returns {@code false}, the handling is forwarded onto
-     * the players current server.
-     *
-     * @param invocation the invocation context
-     * @return {@code true} if the source has permission
-     */
     @Override
     public boolean hasPermission(@NotNull Invocation invocation) {
         return true;

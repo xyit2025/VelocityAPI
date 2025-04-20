@@ -1,9 +1,8 @@
 package com.bulefire.informationAPI.command;
 
 import com.bulefire.informationAPI.command.bind.BindCommand;
-import com.bulefire.informationAPI.command.shout.ShoutAddCommand;
-import com.bulefire.informationAPI.command.shout.ShoutFindCommand;
-import com.bulefire.informationAPI.command.shout.ShoutSetCommand;
+import com.bulefire.informationAPI.command.shout.ShoutCommand;
+import com.bulefire.informationAPI.command.shout.ShoutFindPlayerCommand;
 import com.velocitypowered.api.command.CommandManager;
 import com.velocitypowered.api.command.CommandMeta;
 import com.velocitypowered.api.proxy.ProxyServer;
@@ -19,19 +18,13 @@ public class Register {
         cm.register(bdMeta, new BindCommand());
         // shout
         //set
-        CommandMeta setMeta = cm.metaBuilder("set")
-                .aliases("s")
+        CommandMeta shoutMeta = cm.metaBuilder("shout")
+                .aliases("sh")
                 .build();
-        cm.register(setMeta, new ShoutSetCommand(server));
-        //add
-        CommandMeta addMeta = cm.metaBuilder("add")
-                .aliases("a")
+        cm.register(shoutMeta, new ShoutCommand());
+
+        CommandMeta shoutFindMeta = cm.metaBuilder("find")
                 .build();
-        cm.register(addMeta, new ShoutAddCommand(server));
-        //find
-        CommandMeta findMeta = cm.metaBuilder("find")
-                .aliases("f")
-                .build();
-        cm.register(findMeta, new ShoutFindCommand());
+        cm.register(shoutFindMeta, new ShoutFindPlayerCommand());
     }
 }

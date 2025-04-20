@@ -7,7 +7,7 @@ public class ConfigJson {
     private List<String> token;
     private Address address;
     private Database database;
-    private String format;
+    private Integer cooldownTime;
 
     public static class Address {
         private String base;
@@ -128,11 +128,11 @@ public class ConfigJson {
         this.address = address;
     }
 
-    public String getFormat() {
-        return format;
+    public Integer getCooldownTime() {
+        return cooldownTime;
     }
 
-    public void setFormat(String format) {
-        this.format = format;
+    public void setCooldownTime(Integer cooldownTime) {
+        this.cooldownTime = cooldownTime;
     }
 }

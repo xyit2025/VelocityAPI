@@ -23,15 +23,15 @@ public class ShoutAddCommand implements SimpleCommand {
     @Override
     public void execute(@NotNull Invocation invocation) {
         String[] args = invocation.arguments();
-        if (args.length != 2){
-            invocation.source().sendMessage(Component.text("Usage: /shout add <name> <shout>"));
+        if (args.length != 3){
+            invocation.source().sendMessage(Component.translatable("shout.add.help.message"));
         }
 
-        String playerName = args[0];
-        int shout = Integer.parseInt(args[1]);
+        String playerName = args[1];
+        int shout = Integer.parseInt(args[2]);
         PlayerDAO.updateShoutByName(playerName,PlayerDAO.getShoutByName(playerName) + shout);
-        invocation.source().sendMessage(Component.text("Added " + shout + " to " + playerName + "'s shout successfully"));
-        invocation.source().sendMessage(Component.text("new shout is " + PlayerDAO.getShoutByName(playerName)));
+        invocation.source().sendMessage(Component.translatable("shout.add.successful").arguments(Component.text(shout), Component.text(playerName)));
+        invocation.source().sendMessage(Component.translatable("shout.add.successful.update").arguments(Component.text(PlayerDAO.getShoutByName(playerName))));
     }
 
     @Override
@@ -45,7 +45,7 @@ public class ShoutAddCommand implements SimpleCommand {
     }
 
     @Override
-    public boolean hasPermission(Invocation invocation) {
+    public boolean hasPermission(@NotNull Invocation invocation) {
         return invocation.source().hasPermission("informationapi.shout.add");
     }
 }
