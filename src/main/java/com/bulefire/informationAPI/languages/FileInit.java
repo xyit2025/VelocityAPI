@@ -71,6 +71,7 @@ public class FileInit {
             shout.add.successful.update = 新的 shout 是 {0}
             shout.find.bind.qq.not = 您还没有绑定过 QQ
             shout.find.message = 你的 shout 是 {0}
+            shout.find.name.message = {0} 的 shout 是 {1}
             shout.set.help.message = /set <name> <number>
             shout.set.error.negative = shout 不能为负!
             shout.set.successful = 成功设置 {0} 的 shout 为 {1}
@@ -93,6 +94,7 @@ public class FileInit {
             shout.add.successful.update = 新的 shout 是 {0}
             shout.find.bind.qq.not = 您还没有绑定过 QQ
             shout.find.message = 你的 shout 是 {0}
+            shout.find.name.message = {0} 的 shout 是 {1}
             shout.set.help.message = /set <name> <number>
             shout.set.error.negative = shout 不能为负!
             shout.set.successful = 成功设置 {0} 的 shout 为 {1}
