@@ -13,8 +13,17 @@ public class ConfigJson {
         private String base;
         private String query;
         private String find_player;
+        private String find_player_by_Qid;
         private String hh;
         private String blind;
+
+        public String getFind_player_by_Qid() {
+            return find_player_by_Qid;
+        }
+
+        public void setFind_player_by_Qid(String find_player_by_Qid) {
+            this.find_player_by_Qid = find_player_by_Qid;
+        }
 
         public String getBase() {
             return base;

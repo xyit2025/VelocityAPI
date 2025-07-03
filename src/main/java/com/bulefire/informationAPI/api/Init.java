@@ -34,6 +34,7 @@ public class Init {
         String base = Config.getConfigJson().getAddress().getBase();
         String query = Config.getConfigJson().getAddress().getQuery();
         String find_player = Config.getConfigJson().getAddress().getFind_player();
+        String find_player_by_Qid = Config.getConfigJson().getAddress().getFind_player_by_Qid();
         String hh = Config.getConfigJson().getAddress().getHh();
         String blind = Config.getConfigJson().getAddress().getBlind();
 
@@ -111,6 +112,32 @@ public class Init {
             Gson g = new Gson();
             FindPlayerResult result = HttpServer.find_player(g.fromJson(ctx.body(), FindPlayerBody.class).getName());
             logger.info("find_player result is: {}", result);
+            ctx.status(200).json(result);
+        });
+        HttpServer.app.post(base+find_player_by_Qid, ctx -> {
+            logger.info("find_player_by_Qid called");
+            if (!"application/json".equals(ctx.contentType())) {
+                ctx.status(415).json(UnsupportedMediaTypeErr);
+                logger.info("find_player_by_qid 请求被拒绝，原因：Unsupported Media Type");
+                return; // 明确终止请求
+            }
+
+            String token = ctx.header("Authorization");
+            List<String> validTokens = Config.getConfigJson().getToken();
+            if (token == null || !validTokens.contains(token)){
+                ctx.status(401).json(UnauthorizedErr);
+                logger.warn("find_player_by_qid 请求被拒绝，原因：Invalid or missing API token");
+                return;
+            }
+
+            ctx.body();
+            Gson g = new Gson();
+            FindPlayerResult result = HttpServer.find_player_by_Qid(g.fromJson(ctx.body(), FindPlayerBody.class).getName());
+            if (result == null){
+                ctx.status(404).json("No Found");
+                return;
+            }
+            logger.info("find_player_by_qid result is: {}", result);
             ctx.status(200).json(result);
         });
         // hh

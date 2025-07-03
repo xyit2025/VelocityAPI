@@ -62,6 +62,7 @@ public class Config {
             address.setBase("/vc");
             address.setQuery("/query");
             address.setFind_player("/find_player");
+            address.setFind_player_by_Qid("/find_player_by_qid");
             address.setHh("/hh");
             address.setBlind("/blind");
             configJson.setAddress(address);

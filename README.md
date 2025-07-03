@@ -49,6 +49,24 @@ POST /vc/find_player
 }
 ```
 
+````text
+POST /vc/find_player_by_qid
+````
+请求参数
+```json
+{
+  "name": "qid"
+}
+```
+返回
+```json
+{
+  "isOnline": true,
+  "server": "server_name"
+}
+```
+```404```: 没有指定qid对应的玩家
+
 ## 全服喊话
 ````text
 POST /vc/hh

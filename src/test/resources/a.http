@@ -16,6 +16,15 @@ Content-Type: application/json
 {
   "name": "bulefire_fox"
 }
+###
+
+POST http://localhost:8080/vc/find_player_by_qid
+Authorization: 123456789
+Content-Type: application/json
+
+{
+  "name": "ABC123"
+}
 
 ###
 
@@ -36,5 +45,5 @@ Content-Type: application/json
 {
 
   "qqID":"ABC123",
-  "code": "3K9L5LGX"
+  "code": "G6YRRPC6"
 }

@@ -110,6 +110,17 @@ public class HttpServer {
         return result;
     }
 
+    public static @Nullable FindPlayerResult find_player_by_Qid(String qID){
+        String name;
+        try {
+            name = PlayerDAO.getUserNameByQID(qID);
+        } catch (SQLException e) {
+            logger.info("未找到与 QID {} 相关的用户,无法查询", qID);
+            return null;
+        }
+        return find_player(name);
+    }
+
     public static @NotNull String hh(@NotNull String qID, @NotNull String message) {
         Long lastCall = cooldownMap.get(qID);
         if (lastCall != null && System.currentTimeMillis() - lastCall < COOLDOWN_TIME) {
